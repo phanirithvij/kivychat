@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 from pathlib import Path
 
@@ -9,9 +10,18 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.clock import Clock
 kivy.require("1.10.1")
 
+import client
+
 from config import USER_CONFIG_DIR, USER_JOIN_FILE
+
+class ChatPage(GridLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.cols = 2
+        self.add_widget(Label(text="We made it to the chat page!"))
 
 class InfoPage(GridLayout):
     def __init__(self, **kwargs):
@@ -78,6 +88,19 @@ class StartPage(GridLayout):
         app.info_page.update_info(info_message)
         app.screen_manager.current = "Info"
 
+        Clock.schedule_once(self.connect, 1)
+    
+    def connect(self, _):
+        port = int(self.port.text)
+        ip = self.ip.text
+        username = self.username.text
+
+        if not client.connect(ip, port, username, show_error):
+            return
+
+        app.create_chat_page()
+        app.screen_manager.current = "Chat"
+
     def set_config(self, data):
         with open(str(USER_JOIN_FILE), "w+") as file:
             json.dump(data, file)
@@ -110,6 +133,16 @@ class EpicChatApp(App):
         self.screen_manager.add_widget(info_screen)
 
         return self.screen_manager
+    def create_chat_page(self):
+        self.chat_page = ChatPage()
+        screen = Screen(name="Chat")
+        screen.add_widget(self.chat_page)
+        self.screen_manager.add_widget(screen)
+
+def show_error(message):
+    app.info_page.update_info(message)
+    app.screen_manager.current = "Info"
+    Clock.schedule_once(sys.exit, 10)
 
 # if __name__ == "__main__":
 app = EpicChatApp()
