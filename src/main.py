@@ -1,5 +1,6 @@
 import os
 import json
+from pathlib import Path
 
 import kivy
 from kivy.app import App
@@ -78,19 +79,18 @@ class StartPage(GridLayout):
         app.screen_manager.current = "Info"
 
     def set_config(self, data):
-        with open(USER_JOIN_FILE, "w+") as file:
+        with open(str(USER_JOIN_FILE), "w+") as file:
             json.dump(data, file)
 
-        SRC_DIR = os.path.dirname(__file__)
-        TEMP_DEBUG_JOIN_FILE = os.path.join(SRC_DIR, "temp", "join.json")
-        TEMP_DEBUG_JOIN_FILE = os.path.abspath(TEMP_DEBUG_JOIN_FILE)
+        SRC_DIR = Path(__file__).parent
+        TEMP_DEBUG_JOIN_FILE = (SRC_DIR / "temp/join.json").resolve()
 
         print("Temp join file", TEMP_DEBUG_JOIN_FILE)
-        with open(TEMP_DEBUG_JOIN_FILE, "w+") as file:
+        with open(str(TEMP_DEBUG_JOIN_FILE), "w+") as file:
             json.dump(data, file)
 
     def get_config(self):
-        with open(USER_JOIN_FILE, "r") as file:
+        with open(str(USER_JOIN_FILE), "r") as file:
             print(USER_JOIN_FILE)
             return json.load(file)
 
@@ -114,5 +114,9 @@ class EpicChatApp(App):
 # if __name__ == "__main__":
 app = EpicChatApp()
 app.title = "Kivy Epic Chat"
-app.icon = os.path.abspath("assets/icon.ico") # not working
+
+src_path = Path(__file__).parent
+icon_path = (src_path / "assets/icon.ico").resolve()
+app.icon = str(icon_path)
+
 app.run()

@@ -51,6 +51,12 @@ python -m pip install kivy
         TEMP_DEBUG_JOIN_FILE = os.path.abspath(TEMP_DEBUG_JOIN_FILE)
         # finally gives src/temp/join.json
         ```
+        OR
+        ```python
+        from pathlib import Path
+        src_path = Path(__file__).parent
+        icon_path = (src_path / "assets/icon.ico").resolve()
+        ```
     - **Link** : [this stackoverflow post](https://stackoverflow.com/a/40416154/8608146)
 
 
