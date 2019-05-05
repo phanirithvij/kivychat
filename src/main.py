@@ -10,18 +10,90 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.scrollview import ScrollView
+from kivy.core.window import Window
 from kivy.clock import Clock
 kivy.require("1.10.1")
 
 import client
 
 from config import USER_CONFIG_DIR, USER_JOIN_FILE
+from config import RIGHT_MESSAGE, LEFT_MESSAGE
+
+class ChatHistory(ScrollView):
+    def __init__(self, **kw):
+        super().__init__(**kw)
+        self.layout = GridLayout(cols=1, size_hint_y=None)
+        self.add_widget(self.layout)
+
+        self.messages = []
+
+        self.chat_history = GridLayout(cols=2)
+        self.scroll_to_point = Label()
+
+        self.layout.add_widget(self.chat_history)
+        self.layout.add_widget(self.scroll_to_point)
+
+    def update_chat_history(self, chat_message:str, side : int =LEFT_MESSAGE) -> None:
+        self.messages.append((chat_message, side))
+
+        message = Label(markup=True, text=chat_message)
+        if side == LEFT_MESSAGE:
+            self.chat_history.add_widget(message)
+            elabel = Label()
+            self.chat_history.add_widget(elabel)
+        elif side == RIGHT_MESSAGE:
+            elabel = Label()
+            self.chat_history.add_widget(elabel)
+            self.chat_history.add_widget(message)
+
+        self.layout.height = len(self.messages) * (Label().texture_size[1]) + 15
+        # self.chat_history.height = len(self.messages) * 
+        for z in self.chat_history.children:
+            z.height = (Label().texture_size[1])
+            z.text_size = (z.width*0.98, None)
+
+        self.scroll_to(self.scroll_to_point)
 
 class ChatPage(GridLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.cols = 2
-        self.add_widget(Label(text="We made it to the chat page!"))
+        self.cols = 1
+        self.rows = 2
+
+        # self.history = Label(height=Window.size[1]*0.9, size_hint_y=None)
+        self.history = ChatHistory(height=Window.size[1]*0.9, size_hint_y=None)
+        self.add_widget(self.history)
+
+        self.message_input = TextInput(width=Window.size[0]*0.8, size_hint_x=None, multiline=False)
+        self.message_input.focus = True
+        self.send_btn = Button(text="Send")
+        # self.send_btn.on_press = self.send_message
+        self.send_btn.bind(on_press=self.send_message)
+
+        holder = GridLayout(cols=2)
+        holder.add_widget(self.message_input)
+        holder.add_widget(self.send_btn)
+
+        self.add_widget(holder)
+
+        Window.bind(on_key_down=self.on_key_down)
+    
+    def on_key_down(self, inst, keyb, keyc, text, modif):
+        if keyc == 40: # enterkey
+            self.send_message(None)
+
+    def send_message(self, _) -> None :
+        message = self.message_input.text
+        self.message_input.text = ""
+        if message:
+            # send and update_chat_history
+            message = f"[color=dd2020]{app.start_page.username_dat}[/color] > {message}"
+            app.chat_page.history.update_chat_history(message, RIGHT_MESSAGE)
+            Clock.schedule_once(self.focus_async, 0.2)
+
+    def focus_async(self, _):
+        self.message_input.focus = True
 
 class InfoPage(GridLayout):
     def __init__(self, **kwargs):

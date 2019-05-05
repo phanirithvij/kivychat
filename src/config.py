@@ -7,6 +7,9 @@ from pathlib import Path
 USER_CONFIG_DIR = (Path.home() / ".kivy_chat").resolve()
 USER_JOIN_FILE = (Path(USER_CONFIG_DIR) / "join.json")
 
+LEFT_MESSAGE = -1
+RIGHT_MESSAGE = 1
+
 def setup_dirs():
     if not Path(USER_CONFIG_DIR).is_dir():
         os.makedirs(str(USER_CONFIG_DIR))
