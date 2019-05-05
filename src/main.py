@@ -80,6 +80,15 @@ class StartPage(GridLayout):
     def set_config(self, data):
         with open(USER_JOIN_FILE, "w+") as file:
             json.dump(data, file)
+
+        SRC_DIR = os.path.dirname(__file__)
+        TEMP_DEBUG_JOIN_FILE = os.path.join(SRC_DIR, "temp", "join.json")
+        TEMP_DEBUG_JOIN_FILE = os.path.abspath(TEMP_DEBUG_JOIN_FILE)
+
+        print("Temp join file", TEMP_DEBUG_JOIN_FILE)
+        with open(TEMP_DEBUG_JOIN_FILE, "w+") as file:
+            json.dump(data, file)
+
     def get_config(self):
         with open(USER_JOIN_FILE, "r") as file:
             print(USER_JOIN_FILE)
