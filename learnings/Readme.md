@@ -29,11 +29,36 @@ Finally
 python -m pip install kivy
 ```
 
+## New stuff
++ Getting Relative path in python
+    - **Title** : Get the same file relative to the source dir independent of the execution directory
+    eg:
+        ```shell
+        #from ./
+        python src/main.py
+        #or from ./src/
+        python ../src/main.py
+        #or from ~
+        pyhton /path/to/src/main.py
+        #or from ./src/
+        python ./main.py
+        ```
+    Should all access the same file inside like relative imports.
+    - **Solution** :
+        ```python
+        SRC_DIR = os.path.dirname(__file__)
+        TEMP_DEBUG_JOIN_FILE = os.path.join(SRC_DIR, "temp", "join.json")
+        TEMP_DEBUG_JOIN_FILE = os.path.abspath(TEMP_DEBUG_JOIN_FILE)
+        # finally gives src/temp/join.json
+        ```
+    - **Link** : [this stackoverflow post](https://stackoverflow.com/a/40416154/8608146)
+
+
 ## Bugs
 
 
 ## Mistakes
-+ Changing App icon
++ Changing App icon in Kivy
     - **Issue** : Changing the kivy app icon didn't work
     - **State** : unresolved
     - **Solution** : Nothing
