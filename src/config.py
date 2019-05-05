@@ -6,8 +6,6 @@ from pathlib import Path
 # USER_CONFIG_DIR = os.path.abspath(USER_CONFIG_DIR)
 USER_CONFIG_DIR = (Path.home() / ".kivy_chat").resolve()
 USER_JOIN_FILE = (Path(USER_CONFIG_DIR) / "join.json")
-# USER_CONFIG_DIR = str(USER_CONFIG_DIR)
-# USER_JOIN_FILE = str(USER_JOIN_FILE)
 
 def setup_dirs():
     if not Path(USER_CONFIG_DIR).is_dir():
