@@ -7,9 +7,24 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
+from kivy.uix.screenmanager import ScreenManager, Screen
 kivy.require("1.10.1")
 
 from config import USER_CONFIG_DIR, USER_JOIN_FILE
+
+class InfoPage(GridLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.cols = 2
+        self.message = Label(halign="center", valign="middle", font_size=30)
+        self.message.bind(width=self.update_text_width)
+        self.add_widget(self.message)
+
+    def update_info(self, message):
+        self.message.text = message
+
+    def update_text_width(self, *_):
+        self.message.text_size = (self.message.width*0.9, None)
 
 class StartPage(GridLayout):
     def __init__(self, **kwargs):
@@ -50,12 +65,17 @@ class StartPage(GridLayout):
         port = self.port.text
         username = self.username.text
 
-        print(f"Trying to join {ip}:{port} as {username}")
         self.set_config({
             "ip" : ip,
             "port"   : port,
             "username" : username
         })
+
+        info_message = f"Joining {ip}:{port} as {username}"
+        print(info_message)
+
+        app.info_page.update_info(info_message)
+        app.screen_manager.current = "Info"
 
     def set_config(self, data):
         with open(USER_JOIN_FILE, "w+") as file:
@@ -67,10 +87,23 @@ class StartPage(GridLayout):
 
 class EpicChatApp(App):
     def build(self):
-        return StartPage()
+        self.screen_manager = ScreenManager()
 
-if __name__ == "__main__":
-    app = EpicChatApp()
-    app.title = "Kivy Epic Chat"
-    app.icon = os.path.abspath("assets/icon.ico") # not working
-    app.run()
+        self.start_page = StartPage()
+        start_screen = Screen(name="Connect")
+        start_screen.add_widget(self.start_page)
+
+        self.info_page = InfoPage()
+        info_screen = Screen(name="Info")
+        info_screen.add_widget(self.info_page)
+
+        self.screen_manager.add_widget(start_screen)
+        self.screen_manager.add_widget(info_screen)
+
+        return self.screen_manager
+
+# if __name__ == "__main__":
+app = EpicChatApp()
+app.title = "Kivy Epic Chat"
+app.icon = os.path.abspath("assets/icon.ico") # not working
+app.run()
