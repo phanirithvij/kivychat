@@ -11,9 +11,6 @@ kivy.require("1.10.1")
 
 from config import USER_CONFIG_DIR, USER_JOIN_FILE
 
-def init_conf():
-    pass
-
 class StartPage(GridLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -73,7 +70,6 @@ class EpicChatApp(App):
         return StartPage()
 
 if __name__ == "__main__":
-    init_conf()
     app = EpicChatApp()
     app.title = "Kivy Epic Chat"
     app.icon = os.path.abspath("assets/icon.ico") # not working
