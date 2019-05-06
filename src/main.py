@@ -34,7 +34,7 @@ class ChatHistory(ScrollView):
         self.layout.add_widget(self.chat_history)
         self.layout.add_widget(self.scroll_to_point)
 
-    def update_chat_history(self, chat_message:str, side : int =LEFT_MESSAGE) -> None:
+    def update_chat_history(self, chat_message : str, side : int=LEFT_MESSAGE) -> None:
         self.messages.append((chat_message, side))
 
         message = Label(markup=True, text=chat_message)
@@ -68,6 +68,7 @@ class ChatPage(GridLayout):
         self.message_input = TextInput(width=Window.size[0]*0.8, size_hint_x=None, multiline=False)
         self.message_input.focus = True
         self.send_btn = Button(text="Send")
+        self.send_btn.size_hint_max_y = 30
         # self.send_btn.on_press = self.send_message
         self.send_btn.bind(on_press=self.send_message)
 
@@ -78,10 +79,17 @@ class ChatPage(GridLayout):
         self.add_widget(holder)
 
         Window.bind(on_key_down=self.on_key_down)
-    
+
     def on_key_down(self, inst, keyb, keyc, text, modif):
         if keyc == 40: # enterkey
             self.send_message(None)
+        if keyc == 43: # tab
+            if app.settings_open:
+                app.close_settings()
+                app.settings_open = False
+            else:
+                app.open_settings()
+                app.settings_open = True
 
     def send_message(self, _) -> None :
         message = self.message_input.text
@@ -211,6 +219,9 @@ class EpicChatApp(App):
         screen.add_widget(self.chat_page)
         self.screen_manager.add_widget(screen)
 
+    def on_config_change(self, *args, **kw):
+        print("config changed", *args, **kw)
+
 def show_error(message):
     app.info_page.update_info(message)
     app.screen_manager.current = "Info"
@@ -223,5 +234,6 @@ app.title = "Kivy Epic Chat"
 src_path = Path(__file__).parent
 icon_path = (src_path / "assets/icon.ico").resolve()
 app.icon = str(icon_path)
+app.settings_open = False
 
 app.run()
